@@ -7,11 +7,6 @@ import numpy as np
 import label_color
 from label_color import colorize_mask
 
-# 生成一个简单的二值图像作为示例
-np.random.seed(0)
-image = np.random.randint(0, 2, (50, 50))
-
-
 # 定义随机游走函数
 def random_walk(image, iterations=10, p=0.5):
     kernel = np.array([[0, p, 0],
