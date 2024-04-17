@@ -141,14 +141,13 @@ def colorize_mask(mask, palette):
     new_mask.putpalette(palette)
     return new_mask
 
-
 def save_images(image, mask, output_path, image_file, palette):
     # Saves the image, the model output and the results after the post processing
     w, h = image.size
-    image_file = os.path.basename(image_file).split('.')[0]
+    #image_file = os.path.basename(image_file).split('.')[0]
     colorized_mask = colorize_mask(mask, palette)
-    print(os.path.join(output_path, image_file + '.png'))
-    colorized_mask.save(os.path.join(output_path, image_file + '.png'))
+    print(os.path.join(output_path, image_file))
+    colorized_mask.save(os.path.join(output_path, image_file))
 
 
 if __name__ == '__main__':
@@ -156,4 +155,4 @@ if __name__ == '__main__':
     for image_id in files:
         image_path = os.path.join(in_path, image_id + '.png')
         image = np.asarray(Image.open(image_path).convert('RGB'), dtype=np.float32)
-        save_images(Image.open(image_path), image, output_path, image_id + '.png', ADE20K_palette)
+        save_images(Image.open(image_path), image, output_path, image_id + '.png', CityScpates_palette)

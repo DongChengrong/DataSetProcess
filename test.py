@@ -1,43 +1,46 @@
-import os
-
 import numpy as np
 from PIL import Image
-image_path = r'/home/lab611/dcr/new/pytorch-segmentation-master/data/ADEChallengeData2016/annotations/training/ADE_train_00000006.png'
-label_path = r'/home/lab611/dcr/new/pytorch-segmentation-master/output/ade20k/ADE_train_00000006.png'
 
-pixel_number_list = [[0, 1472092, 622903, 1763976, 1031580, 1502058, 3496584, 2993896, 5785458, 1913799, 2282939, 2326733, 3352147, 2033111, 1861247, 10572105, 1457716, 1356007, 2534339, 3145856, 1779999], [0, 922858, 447056, 896897, 452163, 564205, 1512717, 1104240, 2555721, 1054701, 998591, 589700, 2300720, 516643, 1227650, 4786934, 595873, 1006317, 1368572, 1943506, 761368], [0, 288437, 177078, 585334, 206046, 282625, 1065801, 651087, 1154206, 513749, 493346, 833885, 919530, 435599, 363711, 2571711, 202096, 408690, 1071042, 463432, 571945], [0, 195226, 68697, 384194, 297367, 416101, 729731, 561007, 1118210, 477840, 375422, 852742, 630787, 495832, 560391, 2063346, 424134, 567921, 780818, 1210575, 583764]]
 
-if __name__ == '__main__':
+def ID(matrix):
+    # return matrix
+    return matrix[0] * (256 * 256) + matrix[1] * 256 + matrix[2]
 
-    for client in pixel_number_list:
-        print(client)
-    weight = [0.0]*4
-    n = len(pixel_number_list)
-    pixel_per_list = []
-    for i in range(n):
-        pixel_per_list.append([0.0])
-    for i in range(1, 21):
-        tot = 0.0
-        for j in range(n):
-            tot = tot + pixel_number_list[j][i]
-        for j in range(n):
-            pixel_per_list[j].append(pixel_number_list[j][i] / tot)
-    for i in range(n):
-        for j in range(1, 21):
-            weight[i] = weight[i] + pixel_per_list[i][j] / 20
-    print(pixel_per_list)
-    print(weight)
-    print(sum(weight))
-    # image_1 = np.asarray(Image.open(image_path), dtype=np.int32)
-    # image_2 = np.asarray(Image.open(label_path), dtype=np.int32)
-    # print(image_2)
-    # num = 0.0
-    # acc = 0.0
-    # for i in range(image_2.shape[0]):
-    #     for j in range(image_2.shape[1]):
-    #         num = num + 1
-    #         if image_1[i][j] != 0 and image_1[i][j] == image_2[i][j]:
-    #             print(image_2[i][j], end=' ')
-    #             acc = acc + 1
-    #     print('')
-    # print(acc/num)
+
+# 读取图像文件  
+image_path = 'G:\DataSets/cityscapes/cityscapes_instance/aachen_000016_000019_gtFine_instanceIds.png'  # 替换为你的图像文件路径
+image = Image.open(image_path)
+
+# 确保图像是RGB格式  
+if image.mode != 'RGB':
+    image = image.convert('RGB')
+
+# 获取图像的宽和高  
+width = np.array(image).shape[0]
+height = np.array(image).shape[1]
+myDict = {}
+color_count = 0
+colors = [[241, 215, 126], [147, 75, 67], [147, 148, 231], [215, 99, 100], [177, 206, 70], [95, 151, 210]]
+
+image = np.array(image)
+
+for y in range(height):
+    for x in range(width):
+        # 获取像素的RGB值
+        r, g, b = image[x][y][0], image[x][y][1], image[x][y][2]
+        if x == 300:
+            print(f'{r}  {g}  {b}')
+        if r == 11 and g == 11 and b == 11:
+            continue
+        iid = ID(image[x, y])
+        if iid in myDict:
+            image[x][y] = colors[myDict[iid]]
+        else:
+            myDict[iid] = color_count
+            color_count = color_count + 1
+            image[x][y] = colors[myDict[iid]]
+            if color_count == 6:
+                color_count = 0
+
+image = Image.fromarray(image)
+image.save('G:\DataSets/cityscapes/visualization_results/with_ins/aachen_000016_000019_gtFine_instanceIds.png')

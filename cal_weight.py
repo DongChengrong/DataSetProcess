@@ -190,20 +190,20 @@ def cal_weight():
     print(n)
     for i in range(n):
         pixel_per_list.append([0.0])
-    for i in range(1, 21):
+    for i in range(1, 19):
         tot = 0.0
         for j in range(n):
             tot = tot + pixel_count_list[j][i]
         for j in range(n):
             pixel_per_list[j].append(pixel_count_list[j][i] / tot)
     for i in range(n):
-        for j in range(1, 21):
-            weight[i] = weight[i] + pixel_per_list[i][j] / 20
+        for j in range(1, 19):
+            weight[i] = weight[i] + pixel_per_list[i][j] / 18
     print(weight)
     print(sum(weight))
 
 def pixel_number_count():
-    input_dir = [f"/home/lab611/dcr/datasets/split_6/client{i + 1}/label" for i in range(client_num)]
+    input_dir = [f"G:\DataSets/fedMTL/cityscapes/split_2/client{i + 1}/label" for i in range(client_num)]
     global count
     for dir in input_dir:
         count = [0] * 21
@@ -218,17 +218,3 @@ def pixel_number_count():
 if __name__ == '__main__':
     pixel_number_count()
     cal_weight()
-    # mp.set_start_method('spawn')
-    #
-    # queue_img = mp.Queue(64)
-    # queue_idx__img_path = mp.Queue(len(img_paths))
-    # [queue_idx__img_path.put(idx__img_path) for idx__img_path in enumerate(img_paths)]
-    #
-    # processes = list()
-    # for i in range(64):
-    #     processes.append(mp.Process(target=count_pixels, args=(queue_img, queue_idx__img_path)),)
-    #
-    # [setattr(process, "daemon", True) for process in processes]
-    # [process.start() for process in processes]
-    # [process.join() for process in processes]
-    # print(count)
