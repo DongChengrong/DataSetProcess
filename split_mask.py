@@ -9,11 +9,24 @@ import sys
 from palette import CityScpates_palette
 from util import colorize_mask
 
+ALPHA = 0.3
+highlight_object = [5,6,7,11,12,17,18]
+weaker_object = [0, 2, 255]
+beta = 3.9
+gamma = 0.7
+
 save_dir = r'G:\github_codes\DataSetProcess'
 ins_dict = {}  # 记录实例区域出现最多的伪标签是什么
 ins_seg_match = {}  # 记录实例应该保存什么标签
 save_path = r'G:\github_codes\DataSetProcess\tmp.png'
+ignore_label =255
 
+ID_TO_TRAINID = {-1: ignore_label, 0: ignore_label, 1: ignore_label, 2: ignore_label,
+                    3: ignore_label, 4: ignore_label, 5: ignore_label, 6: ignore_label,
+                    7: 0, 8: 1, 9: ignore_label, 10: ignore_label, 11: 2, 12: 3, 13: 4,
+                    14: ignore_label, 15: ignore_label, 16: ignore_label, 17: 5,
+                    18: ignore_label, 19: 6, 20: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14,
+                    28: 15, 29: ignore_label, 30: ignore_label, 31: 16, 32: 17, 33: 18}
 
 # 使用深度优先首先对图像块进行重新编号
 def dfs(vis, boud, cnt, start_x, start_y, max_x, max_y):
@@ -40,13 +53,16 @@ def re_id(matrix):
 def solve(file_path, label_path):
     image = np.array(Image.open(file_path))
     label = np.array(Image.open(label_path))
-    print(label.shape)
     max_x = image.shape[0]
     max_y = image.shape[1]
+    h, w = image.shape[0], image.shape[1]
+
+    for k, v in ID_TO_TRAINID.items():
+        label[label == k] = v
 
     # 读取图片并将其转化为浮点型
     temp_image = img_as_float(io.imread(file_path))
-    numSegments = 300
+    numSegments = 3072
 
     # 应用slic算法并获取分割结果
     segments = slic(temp_image, n_segments=numSegments, sigma=5)
@@ -63,6 +79,21 @@ def solve(file_path, label_path):
             if mask[i][j] == 0 and boud[i][j] == np.bool_(False):
                 dfs(mask, boud, cnt, i, j, max_x, max_y)
                 cnt = cnt + 1
+        # 遍历，生成细化后的伪标签
+    for i in range(h):
+        for j in range(w):
+            if mask[i][j] == 0:
+                flag = False
+                for ii in range(-1, 2):
+                    if flag:
+                        break
+                    for jj in range(-1, 2):
+                        if i + ii >= 0 and i + ii < h and j + jj >= 0 and j + jj < w:
+                            if mask[i + ii][j + jj] != 0:
+                                print(f'{i}  {j}   {mask[i][j]}    {mask[i + ii][j + jj]}')
+                                mask[i][j] == mask[i +ii][j +jj]
+                                flag = True
+                                break
 
     ins_dict.clear()
     ins_seg_match.clear()
@@ -89,6 +120,15 @@ def solve(file_path, label_path):
         tmp_dict = ins_dict[key1]
         for key2 in ins_dict[key1].keys():
             count = count + tmp_dict[key2]
+            # 如果是高亮目标，扩大影响
+            if key2 in highlight_object:
+                tmp_dict[key2] = tmp_dict[key2] * beta
+            # 如果是弱化目标，削弱影响
+            if key2 in weaker_object:
+                tmp_dict[key2] = tmp_dict[key2] * gamma
+            if tmp_dict[key2] > max_num:
+                max_num = tmp_dict[key2]
+                max_key = key2
             if tmp_dict[key2] > max_num:
                 max_num = tmp_dict[key2]
                 max_key = key2

@@ -1,4 +1,8 @@
 # 给图像染色，mask类型为numpy
+import numpy as np
+from PIL import Image
+
+
 def colorize_mask(mask, palette):
     zero_pad = 256 * 3 - len(palette)
     for i in range(zero_pad):

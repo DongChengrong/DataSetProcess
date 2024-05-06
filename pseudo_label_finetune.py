@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 ALPHA = 0.3
 highlight_object = [5,6,7,11,12,17,18]
-weaker_object = [0, 2]
+weaker_object = [0, 2, 255]
 beta = 3.9
 gamma = 0.7
 
