@@ -13,7 +13,7 @@ from label_color import colorize_mask
 # 初始标签
 # 指定图像路径
 image_path = r"G:\DataSets\cityscapes\gtCoarse\gtCoarse\train\aachen\aachen_000000_000019_gtCoarse_labelIds.png"
-image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+image = np.array(Image.open(r'G:\DataSets\cityscapes\leftImg8bit\train\aachen\aachen_000000_000019_leftImg8bit.png'))
 
 # 使用PIL库读取图像
 image_pil = Image.open(image_path)
@@ -31,6 +31,8 @@ dcrf_params = {
     'pos_w': 3
 }
 
+print(image.shape)
+print(image.shape[1])
 # 创建一个dCRF对象
 d = dcrf.DenseCRF2D(image.shape[1], image.shape[0], 2)
 

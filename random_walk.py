@@ -36,7 +36,7 @@ result = colorize_mask(result, label_color.CityScpates_palette)
 # 绘制结果
 plt.figure(figsize=(12, 6))
 plt.subplot(1, 3, 1)
-plt.imshow(image, cmap='gray')
+plt.imshow(image_pil, cmap='gray')
 plt.title('Original Image')
 
 plt.subplot(1, 3, 2)
